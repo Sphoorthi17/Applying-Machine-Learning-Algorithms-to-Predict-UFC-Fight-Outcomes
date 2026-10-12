@@ -35,3 +35,16 @@ python demo.py --data data/data.csv --fighters "Fighter A" "Fighter B"
 3. Time-series split (20 folds); standardise using the training fold only.
 4. Train/evaluate all four models; compare against an "always guess Red" baseline.
 5. Produce feature importance, pruning, and trend plots.
+
+## Improved pipeline (extension beyond the paper)
+`ufc_improved.py` adds three changes and evaluates them with the same 20-fold time-series split:
+1. **Difference features** - every `R_x`/`B_x` pair becomes `R_x - B_x`.
+2. **Swap augmentation** - each training fight gets a mirrored copy (Red and Blue swapped, label flipped). Test folds are never augmented.
+3. **Regularization** - L2/L1 logistic regression, L2-penalised MLP, shallow/subsampled Random Forest and Gradient Boosting.
+
+```bash
+python ufc_improved.py --data data/data.csv                # improved pipeline + regularization sweep
+python ufc_improved.py --data data/data.csv --ablation     # also "diff features only" (no swap) to isolate each change
+python ufc_improved.py --data data/data.csv --skip-baseline  # skip the slow paper Gradient Boosting reference run
+```
+Outputs go to `results/improved/`: `summary_improved.csv`, `fold_accuracy_improved.png`, `confusion_matrices_improved.png`, `regularization_sweep.png/.csv`, `l1_selected_features.csv`.
